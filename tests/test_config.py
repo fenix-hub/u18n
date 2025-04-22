@@ -3,7 +3,7 @@ import os
 import pytest
 import tempfile
 import yaml
-from app.config.config_loader import load_config, update_nested_dict
+from config.config_loader import load_config, update_nested_dict
 
 class TestConfig:
     """Tests for configuration loading functionality"""

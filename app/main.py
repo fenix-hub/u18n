@@ -7,7 +7,7 @@ from app.api.routes import register_routes
 from app.services.rate_limiter import RateLimiter
 from app.services.request_throttler import RequestThrottler
 from app.services.translation_service import TranslationPackageManager
-from app.config.config_loader import load_config
+from config.config_loader import load_config
 
 # Global service instances
 config = None

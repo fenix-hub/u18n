@@ -2,6 +2,10 @@
 
 A high-performance, scalable translation microservice built with Flask and ArgosTranslate, designed for ease of use and integration into any multilingual application.
 
+The microservice provides a robust translation API built on Flask and ArgosTranslate, with features like rate limiting, request throttling, and flexible configuration. The implementation follows best practices with proper error handling, middleware design, and comprehensive testing.  
+
+The service can handle various input and output formats, making it easy to integrate with different client applications. It's Docker-ready for easy deployment and includes health checks for monitoring.  
+
 ## 🌟 Features
 
 - **Multiple Translation Pairs**: Support for various language pairs (en-es, es-en, en-fr, fr-en, en-de, de-en)
