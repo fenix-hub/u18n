@@ -1,6 +1,5 @@
-flask==2.0.1
-gunicorn==20.1.0
-argostranslate==1.8.0
-pyyaml==6.0
-pytest==7.3.1
-flask-cors==3.0.10
+argostranslate==1.9.6
+Flask==3.1.0
+flask_cors==5.0.1
+pytest==8.3.5
+PyYAML==6.0.2

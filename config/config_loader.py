@@ -35,7 +35,7 @@ def load_config(config_path: str = None) -> Dict[str, Any]:
         },
         "translation": {
             "max_chars_per_request": 5000,
-            "available_packages": ["en-es", "es-en", "en-fr", "fr-en", "en-de", "de-en"],
+            "available_packages": ["en-es", "es-en", "en-fr", "fr-en", "en-de", "de-en", "it-en", "en-it"],
             "fallback_response": "Translation service unavailable"
         },
         "formats": {

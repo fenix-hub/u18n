@@ -145,6 +145,8 @@ translation:
     - "fr-en"
     - "en-de"
     - "de-en"
+    - "it-en"
+    - "en-it"
   fallback_response: "Translation service unavailable. Please try again later."
 
 formats:
