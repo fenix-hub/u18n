@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  translation-service:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./:/app
+      # Volume for storing downloaded translation models
+      - translation-models:/root/.argos-translate
+    environment:
+      - FLASK_APP=app/main.py
+      - FLASK_ENV=production
+      - CONFIG_PATH=/app/config/default_config.yml
+      # Uncomment to override config values
+      # - RATE_LIMIT_ENABLED=true
+      # - RATE_LIMIT_RPM=60 
+      # - RATE_LIMIT_BURST=10
+      # - THROTTLING_ENABLED=true
+      # - THROTTLING_CONCURRENT=5
+      # - MAX_CHARS_PER_REQUEST=5000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  translation-models:
+    # Persistent volume for translation models

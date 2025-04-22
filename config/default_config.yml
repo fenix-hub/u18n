@@ -1,0 +1,29 @@
+# config/default_config.yml
+
+rate_limit:
+  requests_per_minute: 60
+  burst: 10
+  enabled: true
+
+throttling:
+  concurrent_requests: 5
+  enabled: true
+
+translation:
+  max_chars_per_request: 5000
+  available_packages:
+    - "en-es"
+    - "es-en"
+    - "en-fr"
+    - "fr-en"
+    - "en-de"
+    - "de-en"
+  fallback_response: "Translation service unavailable. Please try again later."
+
+formats:
+  input:
+    - "json"
+    - "text"
+  output:
+    - "json"
+    - "text"
