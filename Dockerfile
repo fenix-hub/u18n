@@ -33,4 +33,4 @@ ENV PORT=5000
 EXPOSE 5000
 
 # Run the application using gunicorn for production
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "app.main:app"]
+CMD ["gunicorn", "-c", "config/gunicorn_config.py", "app.main:app"]
