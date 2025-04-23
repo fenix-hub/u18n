@@ -7,6 +7,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
+    pkg-config \
+    cmake \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -15,6 +17,9 @@ COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Install gunicorn depencendy
+RUN pip install --no-cache-dir gunicorn
 
 # Copy application code
 COPY . .
