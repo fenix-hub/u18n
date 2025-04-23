@@ -1,0 +1,335 @@
+openapi: 3.0.0
+info:
+  title: u18n - Universal Translation Microservice API
+  version: "1.0.0"
+  description: API for translating text between languages, with support for multiple formats, rate limiting, and throttling.
+servers:
+  - url: http://localhost:5000 # Adjust if your deployment URL is different
+    description: Development server
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Returns service status, installed language packages, and basic configuration info.
+      operationId: getHealthCheck
+      tags:
+        - Status
+      responses:
+        '200':
+          description: Service is healthy and configuration details returned.
+          headers:
+            X-RateLimit-Limit:
+              schema:
+                type: integer
+              description: Maximum requests allowed per minute.
+            X-RateLimit-Remaining:
+              schema:
+                type: number
+                format: float
+              description: Requests remaining in the current window.
+            X-RateLimit-Reset:
+              schema:
+                type: integer
+              description: Seconds until the rate limit resets.
+            X-Throttle-Limit:
+              schema:
+                type: integer
+              description: Maximum concurrent requests allowed.
+            X-Throttle-Remaining:
+              schema:
+                type: integer
+              description: Available concurrent request slots.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+                  installedPackages:
+                    type: array
+                    items:
+                      type: string
+                    example: ["en-es", "es-en"]
+                  serviceInfo:
+                    type: object
+                    properties:
+                      rateLimit:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                          requests_per_minute:
+                            type: integer
+                          burst:
+                            type: integer
+                      throttling:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                          concurrent_requests:
+                            type: integer
+                      formats:
+                        type: object
+                        properties:
+                          input:
+                            type: array
+                            items:
+                              type: string
+                          output:
+                            type: array
+                            items:
+                              type: string
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        '503':
+          $ref: '#/components/responses/ServiceOverloaded'
+
+  /translate:
+    post:
+      summary: Translate Text
+      description: Translates text from a source language to a target language. Supports JSON and form data input, and JSON or plain text output.
+      operationId: translateText
+      tags:
+        - Translation
+      requestBody:
+        description: Translation request details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranslationRequestJson'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TranslationRequestForm'
+          multipart/form-data: # Also common for forms
+             schema:
+              $ref: '#/components/schemas/TranslationRequestForm'
+      responses:
+        '200':
+          description: Translation successful. Output format depends on the 'outputFormat' parameter.
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+            X-Throttle-Limit:
+              $ref: '#/components/headers/X-Throttle-Limit'
+            X-Throttle-Remaining:
+              $ref: '#/components/headers/X-Throttle-Remaining'
+            X-Translation-Characters:
+              schema:
+                type: integer
+              description: Number of characters in the original text.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationResponseJson'
+            text/plain:
+              schema:
+                type: string
+                example: "Hola mundo"
+        '400':
+          description: Bad request due to missing fields, invalid format, exceeded character limit, or unsupported language pair.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        '500':
+          description: Internal server error during translation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          $ref: '#/components/responses/ServiceOverloaded'
+
+  /config:
+    get:
+      summary: Get Configuration
+      description: Returns the current service configuration.
+      operationId: getConfig
+      tags:
+        - Configuration
+      responses:
+        '200':
+          description: Current configuration returned.
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+            X-Throttle-Limit:
+              $ref: '#/components/headers/X-Throttle-Limit'
+            X-Throttle-Remaining:
+              $ref: '#/components/headers/X-Throttle-Remaining'
+          content:
+            application/json:
+              schema:
+                type: object # Define a more specific schema if possible based on config structure
+                example: {
+                  "rate_limit": {"enabled": true, "requests_per_minute": 60, "burst": 10},
+                  "throttling": {"enabled": true, "concurrent_requests": 5},
+                  "translation": {"max_chars_per_request": 1000, "available_packages": ["en-es", "es-en"], "fallback_response": "[Translation Unavailable]"},
+                  "formats": {"input": ["json", "text"], "output": ["json", "text"]},
+                  "logging": {"level": "INFO", "format": "%(asctime)s - PID:%(process)d - %(name)s - %(levelname)s - %(message)s"}
+                }
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        '503':
+          $ref: '#/components/responses/ServiceOverloaded'
+    put:
+      summary: Update Configuration (Placeholder)
+      description: Endpoint to update the service configuration (implementation not shown).
+      operationId: updateConfig
+      tags:
+        - Configuration
+      responses:
+        '200':
+          description: Configuration update acknowledged (placeholder response).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Configuration update endpoint"
+
+components:
+  schemas:
+    TranslationRequestBase:
+      type: object
+      properties:
+        text:
+          type: string
+          description: The text to be translated.
+          example: "Hello world"
+        source:
+          type: string
+          description: Source language code (e.g., 'en').
+          example: "en"
+        target:
+          type: string
+          description: Target language code (e.g., 'es').
+          example: "es"
+      required:
+        - text
+        - source
+        - target
+    TranslationRequestJson:
+      allOf:
+        - $ref: '#/components/schemas/TranslationRequestBase'
+        - type: object
+          properties:
+            outputFormat:
+              type: string
+              description: Desired output format.
+              enum: ["json", "text"]
+              default: "json"
+              example: "json"
+    TranslationRequestForm:
+       allOf:
+        - $ref: '#/components/schemas/TranslationRequestBase'
+        - type: object
+          properties:
+            outputFormat:
+              type: string
+              description: Desired output format.
+              enum: ["json", "text"]
+              default: "text" # Default for form is usually text
+              example: "text"
+    TranslationResponseJson:
+      type: object
+      properties:
+        translated:
+          type: string
+          description: The translated text.
+          example: "Hola mundo"
+        source:
+          type: string
+          description: The source language used.
+          example: "en"
+        target:
+          type: string
+          description: The target language used.
+          example: "es"
+        original:
+          type: string
+          description: The original text submitted.
+          example: "Hello world"
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A description of the error.
+      required:
+        - error
+
+  responses:
+    RateLimitExceeded:
+      description: Rate limit exceeded. Check headers for details.
+      headers:
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            example: {"error": "Rate limit exceeded"}
+    ServiceOverloaded:
+      description: Service is overloaded due to throttling. Check headers for details.
+      headers:
+        X-Throttle-Limit:
+          $ref: '#/components/headers/X-Throttle-Limit'
+        X-Throttle-Remaining:
+          $ref: '#/components/headers/X-Throttle-Remaining'
+        Retry-After:
+          schema:
+            type: integer
+          description: Suggested seconds to wait before retrying (may not be precise).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            example: {"error": "Service overloaded, try again later"}
+
+  headers:
+    X-RateLimit-Limit:
+      schema:
+        type: integer
+      description: Maximum requests allowed per minute.
+    X-RateLimit-Remaining:
+      schema:
+        type: number
+        format: float
+      description: Requests remaining in the current window.
+    X-RateLimit-Reset:
+      schema:
+        type: integer
+      description: Seconds until the rate limit resets.
+    X-Throttle-Limit:
+      schema:
+        type: integer
+      description: Maximum concurrent requests allowed.
+    X-Throttle-Remaining:
+      schema:
+        type: integer
+      description: Available concurrent request slots.
