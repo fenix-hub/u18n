@@ -126,11 +126,17 @@ Configuration can be provided through:
 | `THROTTLING_ENABLED` | Enable/disable request throttling (true/false) |
 | `THROTTLING_CONCURRENT` | Maximum concurrent requests |
 | `MAX_CHARS_PER_REQUEST` | Character limit per translation request |
-| `AVAILABLE_PACKAGES` | Comma-separated list of language pairs (e.g., "en-es,es-en") |
+| `AVAILABLE_PACKAGES` | Comma-separated list of language pairs (e.g., "en-es,es-en") | 
+| `LOGGING_LEVEL` | Logging level (e.g., DEBUG, INFO, WARNING, ERROR) |
+| `LOGGING_FORMAT` | Python logging format string |
 
 ### Sample Configuration
 
 ```yaml
+logging:
+  level: "INFO"
+  format: "%(asctime)s - PID:%(process)d - %(name)s - %(levelname)s - %(message)s"
+
 rate_limit:
   requests_per_minute: 60
   burst: 10
