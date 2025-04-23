@@ -78,7 +78,7 @@ Updates service configuration.
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/u18n.git
+git clone https://github.com/fenix-hub/u18n.git
 cd u18n
 ```
 
