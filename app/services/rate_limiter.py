@@ -22,11 +22,11 @@ class RateLimiter:
             Tuple of (allowed: bool, headers: Dict[str, str])
         """
         with self.lock:
-            now = time.time()
-            time_passed = now - self.last_check
+            now = time.time() # returns time in seconds since epoch
+            time_passed = now - self.last_check # seconds since last check
             self.last_check = now
             
-            # Add tokens based on time passed
+            # Add tokens based on time passed: 1 token per seconds passed
             self.tokens += time_passed * (self.requests_per_minute / 60.0)
             
             # Cap tokens to burst limit
