@@ -8,6 +8,7 @@ from app.services.rate_limiter import RateLimiter
 from app.services.request_throttler import RequestThrottler
 from app.services.translation_service import TranslationPackageManager
 from config.config_loader import load_config
+from app import setup_logging # Import the setup function
 
 # Global service instances
 config = None
@@ -39,6 +40,9 @@ def initialize_services(test_config=None):
     else:
         config = test_config
     
+    # Setup logging
+    setup_logging(config)
+
     # Initialize rate limiter
     rate_limiter = RateLimiter(
         config["rate_limit"]["requests_per_minute"],

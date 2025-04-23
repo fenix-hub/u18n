@@ -41,6 +41,10 @@ def load_config(config_path: str = None) -> Dict[str, Any]:
         "formats": {
             "input": ["json", "text"],
             "output": ["json", "text"]
+        },
+        "logging": { # Add default logging config
+            "level": "INFO",
+            "format": "%(asctime)s - PID:%(process)d - %(name)s - %(levelname)s - %(message)s"
         }
     }
     
@@ -78,5 +82,11 @@ def load_config(config_path: str = None) -> Dict[str, Any]:
     if os.environ.get('AVAILABLE_PACKAGES'):
         config["translation"]["available_packages"] = os.environ.get('AVAILABLE_PACKAGES').split(',')
     
+    if os.environ.get('LOGGING_LEVEL'):
+        config["logging"]["level"] = os.environ.get('LOGGING_LEVEL').upper()
+
+    if os.environ.get('LOGGING_FORMAT'):
+        config["logging"]["format"] = os.environ.get('LOGGING_FORMAT')
+
     logger.info("Configuration loaded successfully")
     return config
