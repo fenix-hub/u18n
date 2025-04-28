@@ -6,7 +6,7 @@ info:
     API for translating text between languages, with support for multiple
     formats, rate limiting, and throttling.
 servers:
-  - url: 'http://192.168.60.77:5000'
+  - url: 'http://localhost:5000'
     description: Development server
 paths:
   /health:
